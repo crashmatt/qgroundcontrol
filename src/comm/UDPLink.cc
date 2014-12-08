@@ -37,10 +37,20 @@ This file is part of the QGROUNDCONTROL project
 #include "LinkManager.h"
 #include "QGC.h"
 #include <QHostInfo>
+#include <QSettings>
 //#include <netinet/in.h>
 
+UDPLink::UDPLink(QString settingsPath, QString groupName) :
+    socket(NULL),
+    LinkInterface(settingsPath, groupName)
+{
+    loadGroup();
+    UDPLink(this->host, this->port);
+}
+
 UDPLink::UDPLink(QHostAddress host, quint16 port) :
-    socket(NULL)
+    socket(NULL),
+    LinkInterface("Links", "default")
 {
     // We're doing it wrong - because the Qt folks got the API wrong:
     // http://blog.qt.digia.com/blog/2010/06/17/youre-doing-it-wrong/
@@ -52,6 +62,7 @@ UDPLink::UDPLink(QHostAddress host, quint16 port) :
     // Set unique ID and add link to the list of links
     this->id = getNextLinkId();
 	this->name = tr("UDP Link (port:%1)").arg(this->port);
+    saveGroup();
 	emit nameChanged(this->name);
     // LinkManager::instance()->add(this);
     qDebug() << "UDP Created " << name;
@@ -67,6 +78,24 @@ UDPLink::~UDPLink()
     wait();
 
 	this->deleteLater();
+}
+
+void UDPLink::serialize(QSettings* psettings)
+{
+    psettings->setValue("LINK_TYPE", "UDP");
+    psettings->setValue("UDPLINK_PORT", this->port);
+//    psettings->setValue("UDPLINK_HOST", this->host);
+//    psettings->setValue("UDPLINK_HOST", arg(this->host));
+    psettings->sync();
+}
+
+void UDPLink::deserialize(QSettings* psettings)
+{
+     setPort(psettings->value("UDPLINK_PORT").toInt());
+}
+
+QString UDPLink::getGroupName(void){
+    return QString("UDP_%1").arg(this->port);
 }
 
 /**

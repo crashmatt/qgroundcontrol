@@ -37,6 +37,7 @@ This file is part of the QGROUNDCONTROL project
 #include "MainWindow.h"
 #include "QGCMessageBox.h"
 #include "QGCApplication.h"
+#include "UDPLink.h"
 
 LinkManager* LinkManager::_instance = NULL;
 
@@ -143,6 +144,30 @@ ProtocolInterface* LinkManager::getProtocolForLink(LinkInterface* link)
     ProtocolInterface* protocol = _protocolLinks.key(link);
     _dataMutex.unlock();
 	return protocol;
+}
+
+bool LinkManager::loadAllLinks(){
+    bool foundLink = false;
+    QString linkType;
+    QString linkName;
+    QString path;
+    QSettings settings;
+    settings.beginGroup("Links");
+    QStringList links = settings.childGroups();
+
+    QListIterator<QString> it(links);
+    while(it.hasNext()){
+        linkName = it.next();
+        path = linkName + "/LINK_TYPE";
+        linkType = settings.value(path).toString();
+
+        if(linkType == "UDP"){
+            add(new UDPLink("Links", linkName));
+            foundLink = true;
+            break;
+        };
+    };
+    return foundLink;
 }
 
 bool LinkManager::connectAll()

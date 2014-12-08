@@ -20,6 +20,7 @@
 
 SerialLink::SerialLink(QString portname, int baudRate, bool hardwareFlowControl, bool parity,
                        int dataBits, int stopBits) :
+    SerialLinkInterface("Links", portname),
     m_bytesRead(0),
     m_port(Q_NULLPTR),
     type(""),
@@ -38,6 +39,8 @@ SerialLink::SerialLink(QString portname, int baudRate, bool hardwareFlowControl,
     {
         m_portName = ports.first().trimmed();
     }
+
+    setGroupName(m_portName);
 
     checkIfCDC();
 
@@ -66,7 +69,7 @@ SerialLink::SerialLink(QString portname, int baudRate, bool hardwareFlowControl,
     m_dataBits = dataBits;
     m_stopBits = stopBits;
 
-    loadSettings();
+//    loadSettings();
 
     qDebug() << "create SerialLink " << portname << baudRate << hardwareFlowControl
              << parity << dataBits << stopBits;
@@ -131,6 +134,25 @@ bool SerialLink::isBootloader()
     // Not found
     return false;
 }
+
+void SerialLink::serialize(QSettings* psettings)
+{
+    psettings->setValue("LINK_TYPE", "SERIAL");
+    psettings->setValue("SERIALLINK_COMM_PORT", getPortName());
+    psettings->setValue("SERIALLINK_COMM_BAUD", getBaudRateType());
+    psettings->setValue("SERIALLINK_COMM_PARITY", getParityType());
+    psettings->setValue("SERIALLINK_COMM_STOPBITS", getStopBits());
+    psettings->setValue("SERIALLINK_COMM_DATABITS", getDataBits());
+    psettings->setValue("SERIALLINK_COMM_FLOW_CONTROL", getFlowType());
+    psettings->sync();
+
+}
+
+void SerialLink::deserialize(QSettings* psettings)
+{
+
+}
+
 
 void SerialLink::loadSettings()
 {
@@ -510,7 +532,8 @@ bool SerialLink::hardwareConnect(QString &type)
     qDebug() << "CONNECTING LINK: " << __FILE__ << __LINE__ << "type:" << type << "with settings" << m_port->portName()
              << getBaudRate() << getDataBits() << getParityType() << getStopBits();
 
-    writeSettings();
+//    writeSettings();
+    saveGroup();
 
     return true; // successful connection
 }

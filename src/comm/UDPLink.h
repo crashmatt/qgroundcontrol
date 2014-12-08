@@ -45,6 +45,7 @@ class UDPLink : public LinkInterface
     //Q_INTERFACES(UDPLinkInterface:LinkInterface)
 
 public:
+    UDPLink(QString settingsPath, QString groupName);
     UDPLink(QHostAddress host = QHostAddress::Any, quint16 port = 14550);
     //UDPLink(QHostAddress host = "239.255.76.67", quint16 port = 7667);
     ~UDPLink();
@@ -83,6 +84,10 @@ public:
     // connect/disconnect on link directly. All connect/disconnect calls should be made through LinkManager.
     bool connect(void);
     bool disconnect(void);
+
+    void serialize(QSettings* psettings);
+    void deserialize(QSettings* psettings);
+    QString getGroupName(void);
 
 public slots:
     void setAddress(QHostAddress host);

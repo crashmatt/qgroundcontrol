@@ -36,6 +36,7 @@ This file is part of the QGROUNDCONTROL project
 #include <QThread>
 #include <QMutex>
 #include <QString>
+#include <QSettings>
 #include "QGCConfig.h"
 #include "SerialLinkInterface.h"
 
@@ -104,6 +105,9 @@ public:
 
     void loadSettings();
     void writeSettings();
+
+    void serialize(QSettings* psettings);
+    void deserialize(QSettings* psettings);
 
     void checkIfCDC();
 
