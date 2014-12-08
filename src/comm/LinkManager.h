@@ -100,6 +100,8 @@ public slots:
     bool disconnectAll();
     bool disconnectLink(LinkInterface* link);
 
+    bool loadAllLinks();
+
 signals:
     void newLink(LinkInterface* link);
     void linkDeleted(LinkInterface* link);

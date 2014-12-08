@@ -43,7 +43,8 @@ MockLink::MockLink(void) :
     _inNSH(false),
     _mavlinkStarted(false),
     _mavMode(MAV_MODE_FLAG_MANUAL_INPUT_ENABLED),
-    _mavState(MAV_STATE_STANDBY)
+    _mavState(MAV_STATE_STANDBY),
+    LinkInterface("Links", "MockLink")
 {
     _missionItemHandler = new MockLinkMissionItemHandler(_vehicleSystemId, this);
     Q_CHECK_PTR(_missionItemHandler);

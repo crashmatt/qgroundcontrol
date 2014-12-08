@@ -37,6 +37,7 @@ along with PIXHAWK. If not, see <http://www.gnu.org/licenses/>.
 #include <QMutex>
 #include <QMutexLocker>
 #include <QMetaType>
+#include "QGCSettingsGroup.h"
 
 class LinkManager;
 
@@ -45,18 +46,21 @@ class LinkManager;
 * with the groundstation application.
 *
 **/
-class LinkInterface : public QThread
+class LinkInterface : public QThread, public QGCSettingsGroup
 {
     Q_OBJECT
     
     // Only LinkManager is allowed to _connect, _disconnect or delete a link
     friend class LinkManager;
+
+protected:
     
 public:
-    LinkInterface() :
+    LinkInterface(QString settingsPath, QString name) :
         QThread(0),
         _ownedByLinkManager(false),
-        _deletedByLinkManager(false)
+        _deletedByLinkManager(false),
+        QGCSettingsGroup(settingsPath, name)
     {
         // Initialize everything for the data rate calculation buffers.
         inDataIndex = 0;

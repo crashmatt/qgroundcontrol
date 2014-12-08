@@ -42,6 +42,11 @@ class SerialLinkInterface : public LinkInterface
     Q_OBJECT
 
 public:
+    SerialLinkInterface(QString settingsPath, QString name) :
+        LinkInterface(settingsPath, name)
+    {
+    }
+
     virtual QList<QString> getCurrentPorts() = 0;
     virtual QString getPortName() const = 0;
     virtual int getBaudRate() const = 0;

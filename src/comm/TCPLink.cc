@@ -41,7 +41,8 @@ TCPLink::TCPLink(QHostAddress hostAddress, quint16 socketPort) :
     _hostAddress(hostAddress),
     _port(socketPort),
     _socket(NULL),
-    _socketIsConnected(false)
+    _socketIsConnected(false),
+    LinkInterface("Links", "default")
 {
     // We're doing it wrong - because the Qt folks got the API wrong:
     // http://blog.qt.digia.com/blog/2010/06/17/youre-doing-it-wrong/
@@ -293,6 +294,7 @@ qint64 TCPLink::getCurrentOutDataRate() const
 void TCPLink::_resetName(void)
 {
     _name = QString("TCP Link (host:%1 port:%2)").arg(_hostAddress.toString()).arg(_port);
+    setGroupName(_name);
     emit nameChanged(_name);
 }
 
