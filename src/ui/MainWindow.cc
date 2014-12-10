@@ -263,19 +263,22 @@ MainWindow::MainWindow(QSplashScreen* splashScreen, enum MainWindow::CUSTOM_MODE
     connect(this, SIGNAL(x11EventOccured(XEvent*)), mouse, SLOT(handleX11Event(XEvent*)));
 #endif //QGC_MOUSE_ENABLED_LINUX
 
+
     // Connect link
     if (autoReconnect)
     {
         LinkManager* linkMgr = LinkManager::instance();
         Q_ASSERT(linkMgr);
-        
-        SerialLink* link = new SerialLink();
-        
-        // Add to registry
-        linkMgr->add(link);
-        linkMgr->addProtocol(link, mavlink);
-        linkMgr->connectLink(link);
+        if (!linkMgr->loadAllLinks()){
+            SerialLink* link = new SerialLink();
+
+            // Add to registry
+            linkMgr->add(link);
+            linkMgr->addProtocol(link, mavlink);
+            linkMgr->connectLink(link);
+        }
     }
+
 
     // Set low power mode
     enableLowPowerMode(lowPowerMode);

@@ -33,6 +33,7 @@
 #define QGCAPPLICATION_H
 
 #include <QApplication>
+#include <QSystemSemaphore>
 
 #ifdef QGC_RTLAB_ENABLED
 #include "OpalLink.h"
@@ -125,6 +126,8 @@ private:
     static const char* _savedFileParameterDirectoryName;    ///< Name of parameter subdirectory
     
     QList<QGCSingleton*> _singletons;    ///< List of registered global singletons
+
+    QSystemSemaphore _appSemaphore;
     
     bool _runningUnitTests; ///< true: running unit tests, false: normal app
 };

@@ -44,8 +44,19 @@ UDPLink::UDPLink(QString settingsPath, QString groupName) :
     socket(NULL),
     LinkInterface(settingsPath, groupName)
 {
+    // We're doing it wrong - because the Qt folks got the API wrong:
+    // http://blog.qt.digia.com/blog/2010/06/17/youre-doing-it-wrong/
+    moveToThread(this);
+
     loadGroup();
-    UDPLink(this->host, this->port);
+    this->connectState = false;
+
+    // Set unique ID and add link to the list of links
+    this->id = getNextLinkId();
+    this->name = tr("UDP Link (port:%1)").arg(this->port);
+    emit nameChanged(this->name);
+    // LinkManager::instance()->add(this);
+    qDebug() << "UDP Created " << name;
 }
 
 UDPLink::UDPLink(QHostAddress host, quint16 port) :
@@ -62,6 +73,7 @@ UDPLink::UDPLink(QHostAddress host, quint16 port) :
     // Set unique ID and add link to the list of links
     this->id = getNextLinkId();
 	this->name = tr("UDP Link (port:%1)").arg(this->port);
+    setGroupName(QString("UDP_%1").arg(this->port));
     saveGroup();
 	emit nameChanged(this->name);
     // LinkManager::instance()->add(this);
@@ -84,19 +96,17 @@ void UDPLink::serialize(QSettings* psettings)
 {
     psettings->setValue("LINK_TYPE", "UDP");
     psettings->setValue("UDPLINK_PORT", this->port);
-//    psettings->setValue("UDPLINK_HOST", this->host);
+    psettings->setValue("UDPLINK_HOST", this->host.toString());
 //    psettings->setValue("UDPLINK_HOST", arg(this->host));
     psettings->sync();
 }
 
 void UDPLink::deserialize(QSettings* psettings)
 {
-     setPort(psettings->value("UDPLINK_PORT").toInt());
+    this->host = QHostAddress(psettings->value("UDPLINK_HOST").toString());
+    setPort(psettings->value("UDPLINK_PORT").toInt());
 }
 
-QString UDPLink::getGroupName(void){
-    return QString("UDP_%1").arg(this->port);
-}
 
 /**
  * @brief Runs the thread
@@ -134,7 +144,9 @@ void UDPLink::setPort(int port)
 	}
     this->port = port;
 	this->name = tr("UDP Link (port:%1)").arg(this->port);
+    setGroupName(QString("UDP_%1").arg(this->port));
 	emit nameChanged(this->name);
+    saveGroup();
 	if(reconnect)
 	{
 		_connect();

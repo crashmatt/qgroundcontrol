@@ -86,7 +86,8 @@ const char* QGCApplication::_savedFileParameterDirectoryName = "SavedParameters"
 
 QGCApplication::QGCApplication(int &argc, char* argv[], bool unitTesting) :
     QApplication(argc, argv),
-    _runningUnitTests(unitTesting)
+    _runningUnitTests(unitTesting),
+    _appSemaphore("qgroundcontrol", 1, QSystemSemaphore::Open)
 {
     Q_ASSERT(_app == NULL);
     _app = this;
@@ -237,7 +238,10 @@ bool QGCApplication::_initForNormalAppBoot(void)
     MainWindow* mainWindow = new MainWindow(splashScreen, mode);
     Q_CHECK_PTR(mainWindow);
     
+    /*
     UDPLink* udpLink = NULL;
+    LinkManager* linkMgr = LinkManager::instance();
+    Q_ASSERT(linkMgr);
     
     if (mainWindow->getCustomMode() == MainWindow::CUSTOM_MODE_WIFI)
     {
@@ -245,15 +249,18 @@ bool QGCApplication::_initForNormalAppBoot(void)
         // to make sure that all components are initialized when the
         // first messages arrive
         udpLink = new UDPLink(QHostAddress::Any, 14550);
-        LinkManager::instance()->add(udpLink);
+        linkMgr->add(udpLink);
     } else {
-        if(LinkManager::instance()->loadAllLinks() == false){
+        if(linkMgr->loadAllLinks() == false){
             // We want to have a default serial link available for "quick" connecting.
             SerialLink *slink = new SerialLink();
-            LinkManager::instance()->add(slink);
+            linkMgr->add(slink);
+            linkMgr->addProtocol(link, mavlink);
+//            linkMgr->connectLink(link);
         }
     }
-    
+    */
+
 #ifdef QGC_RTLAB_ENABLED
     // Add OpalRT Link, but do not connect
     OpalLink* opalLink = new OpalLink();
@@ -278,7 +285,22 @@ bool QGCApplication::_initForNormalAppBoot(void)
                                     tr("The format for QGroundControl saved settings has been modified. "
                                        "Your saved settings have been reset to defaults."));
     }
-    
+
+    if(!_appSemaphore.acquire()){
+        QMessageBox::StandardButton button = QGCMessageBox::critical(tr("Is an instance of %1 already running?").arg(qAppName()),
+                                                                     tr("It is recommended to close the application and stop all instances. Click Yes to close."),
+                                                                     QMessageBox::Yes | QMessageBox::No,
+                                                                     QMessageBox::No);
+        // Exit application
+        if (button == QMessageBox::Yes)
+        {
+            //mainWindow->close();
+            QTimer::singleShot(200, mainWindow, SLOT(close()));
+        }
+
+    }
+
+/*
     // Check if link could be connected
     if (udpLink && LinkManager::instance()->connectLink(udpLink))
     {
@@ -293,7 +315,7 @@ bool QGCApplication::_initForNormalAppBoot(void)
             QTimer::singleShot(200, mainWindow, SLOT(close()));
         }
     }
-    
+*/
     return true;
 }
 
