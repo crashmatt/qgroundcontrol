@@ -53,7 +53,8 @@ UDPLink::UDPLink(QString settingsPath, QString groupName) :
 
     // Set unique ID and add link to the list of links
     this->id = getNextLinkId();
-    this->name = tr("UDP Link (port:%1)").arg(this->port);
+//    this->name = tr("UDP Link (port:%1)").arg(this->port);
+    this->name = groupName;
     emit nameChanged(this->name);
     // LinkManager::instance()->add(this);
     qDebug() << "UDP Created " << name;
@@ -73,9 +74,9 @@ UDPLink::UDPLink(QHostAddress host, quint16 port) :
     // Set unique ID and add link to the list of links
     this->id = getNextLinkId();
 	this->name = tr("UDP Link (port:%1)").arg(this->port);
-    setGroupName(QString("UDP_%1").arg(this->port));
-    saveGroup();
+    setGroupName(this->name);
 	emit nameChanged(this->name);
+    saveGroup();
     // LinkManager::instance()->add(this);
     qDebug() << "UDP Created " << name;
 }
@@ -144,7 +145,7 @@ void UDPLink::setPort(int port)
 	}
     this->port = port;
 	this->name = tr("UDP Link (port:%1)").arg(this->port);
-    setGroupName(QString("UDP_%1").arg(this->port));
+    setGroupName(this->name);
 	emit nameChanged(this->name);
     saveGroup();
 	if(reconnect)
@@ -424,6 +425,7 @@ QString UDPLink::getName() const
 void UDPLink::setName(QString name)
 {
     this->name = name;
+    setGroupName(name);
     emit nameChanged(this->name);
 }
 

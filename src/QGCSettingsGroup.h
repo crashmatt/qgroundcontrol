@@ -22,7 +22,6 @@ public:
     explicit QGCSettingsGroup(QString parentPath, QString groupName = "default");
 
     void setGroupName(QString groupName);
-
     void loadGroup();
     void saveGroup();
 signals:

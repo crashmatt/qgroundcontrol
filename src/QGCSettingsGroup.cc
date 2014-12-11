@@ -20,6 +20,7 @@ void QGCSettingsGroup::saveGroup(){
     QString groupPath = getGroupPath();
     settings.beginGroup(groupPath);
     serialize(&settings);
+    settings.sync();
     qDebug() << "Saved settings group: " << groupPath;
 }
 
