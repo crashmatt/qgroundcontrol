@@ -87,7 +87,6 @@ public:
 
     void serialize(QSettings* psettings);
     void deserialize(QSettings* psettings);
-    QString getGroupName(void);
 
 public slots:
     void setAddress(QHostAddress host);
