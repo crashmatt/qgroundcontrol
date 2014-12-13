@@ -13,6 +13,8 @@ void QGCSettingsGroup::loadGroup(){
     QSettings settings;
     settings.beginGroup(getGroupPath());
     deserialize(&settings);
+    settings.endGroup();
+    qDebug() << "Loaded settings group: " << groupPath;
 }
 
 void QGCSettingsGroup::saveGroup(){
@@ -20,6 +22,8 @@ void QGCSettingsGroup::saveGroup(){
     QString groupPath = getGroupPath();
     settings.beginGroup(groupPath);
     serialize(&settings);
+    settings.endGroup();
+    settings.sync();
     qDebug() << "Saved settings group: " << groupPath;
 }
 

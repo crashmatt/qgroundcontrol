@@ -480,7 +480,6 @@ HEADERS += \
     src/ui/HUDPanel.h \
     src/ui/HUDPanelWidget.h \
     QGCSettings.h \
-    src/QGCSetting.h \
     src/QGCSettingsGroup.h
 
 SOURCES += \
@@ -622,7 +621,6 @@ SOURCES += \
     src/uas/QGXPX4UAS.cc \
     src/ui/HUDPanel.cpp \
     src/ui/HUDPanelWidget.cpp \
-    src/QGCSetting.cc \
     src/QGCSettingsGroup.cc
 
 #
