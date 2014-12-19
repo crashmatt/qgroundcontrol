@@ -164,7 +164,7 @@ bool LinkManager::loadAllLinks(){
 
     settings.beginGroup(getGroupPath());
     foreach(linkName, links){
-        path = linkName + "/TYPE";
+        path = getGroupName() + "/" + linkName + "/TYPE";
         linkType = settings.value(path).toString();
 
         if(linkType == "UDPLink"){

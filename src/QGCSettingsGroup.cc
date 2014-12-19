@@ -16,7 +16,7 @@ void QGCSettingsGroup::loadGroup(){
     settings.sync();
     deserialize(&settings);
     settings.endGroup();
-
+    loadChildren();
     qDebug() << "Loaded settings group: " << groupPath;
 }
 
@@ -27,6 +27,7 @@ void QGCSettingsGroup::saveGroup(){
     serialize(&settings);
     settings.endGroup();
     settings.sync();
+    saveChildren();
     qDebug() << "Saved settings group: " << groupPath;
 }
 
@@ -42,10 +43,10 @@ void QGCSettingsGroup::setGroupName(QString groupName){
 QString QGCSettingsGroup::getGroupPath(){
     if(p_parent != NULL)
     {
-        return p_parent->getGroupPath() + "/" + _groupName;
+        return p_parent->getGroupPath() + "/" + getGroupName();
     }
     else
-        return _groupName;
+        return getGroupName();
 }
 
 void QGCSettingsGroup::serialize(QSettings* psettings){

@@ -100,7 +100,7 @@ UDPLink::~UDPLink()
 
 void UDPLink::serialize(QSettings* psettings)
 {
-    psettings->setValue("TYPE", "UDP");
+    psettings->setValue("TYPE", "UDPLink");
     psettings->setValue("UDPLINK_PORT", this->port);
     psettings->setValue("UDPLINK_HOST", this->host.toString());
 }

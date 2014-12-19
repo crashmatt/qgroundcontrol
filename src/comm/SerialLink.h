@@ -119,7 +119,7 @@ public:
     void run2();
 
     int getId() const;
-    QString getGroupName();
+    QString getGroupName(void);
 
     // These are left unimplemented in order to cause linker errors which indicate incorrect usage of
     // connect/disconnect on link directly. All connect/disconnect calls should be made through LinkManager.
