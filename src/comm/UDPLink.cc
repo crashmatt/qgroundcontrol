@@ -40,21 +40,28 @@ This file is part of the QGROUNDCONTROL project
 #include <QSettings>
 //#include <netinet/in.h>
 
-UDPLink::UDPLink(QString settingsPath, QString groupName) :
+
+UDPLink::UDPLink(QGCSettingsGroup* pparentGroup, QString groupName) :
     socket(NULL),
-    LinkInterface(settingsPath, groupName)
+    LinkInterface(pparentGroup, name)
 {
     // We're doing it wrong - because the Qt folks got the API wrong:
     // http://blog.qt.digia.com/blog/2010/06/17/youre-doing-it-wrong/
     moveToThread(this);
 
-    loadGroup();
     this->connectState = false;
 
     // Set unique ID and add link to the list of links
-    this->id = getNextLinkId();
+    int temp_id = groupName.split("_").value(1).toInt();
+    if(LinkManager::instance()->isIDinLinks(temp_id))
+        this->link_id = LinkManager::instance()->getNextLinkID();
+    else
+        this->link_id = temp_id;
+
+    loadGroup();
+
 //    this->name = tr("UDP Link (port:%1)").arg(this->port);
-    this->name = groupName;
+    this->name = name;
     emit nameChanged(this->name);
     // LinkManager::instance()->add(this);
     qDebug() << "UDP Created " << name;
@@ -62,7 +69,7 @@ UDPLink::UDPLink(QString settingsPath, QString groupName) :
 
 UDPLink::UDPLink(QHostAddress host, quint16 port) :
     socket(NULL),
-    LinkInterface("Links", "default")
+    LinkInterface(dynamic_cast<QGCSettingsGroup*>(LinkManager::instance()), "default")
 {
     // We're doing it wrong - because the Qt folks got the API wrong:
     // http://blog.qt.digia.com/blog/2010/06/17/youre-doing-it-wrong/
@@ -72,11 +79,9 @@ UDPLink::UDPLink(QHostAddress host, quint16 port) :
     this->port = port;
     this->connectState = false;
     // Set unique ID and add link to the list of links
-    this->id = getNextLinkId();
+    this->link_id = LinkManager::instance()->getNextLinkID();
 	this->name = tr("UDP Link (port:%1)").arg(this->port);
-    setGroupName(this->name);
 	emit nameChanged(this->name);
-    saveGroup();
     // LinkManager::instance()->add(this);
     qDebug() << "UDP Created " << name;
 }
@@ -95,11 +100,9 @@ UDPLink::~UDPLink()
 
 void UDPLink::serialize(QSettings* psettings)
 {
-    psettings->setValue("LINK_TYPE", "UDP");
+    psettings->setValue("TYPE", "UDP");
     psettings->setValue("UDPLINK_PORT", this->port);
     psettings->setValue("UDPLINK_HOST", this->host.toString());
-//    psettings->setValue("UDPLINK_HOST", arg(this->host));
-    psettings->sync();
 }
 
 void UDPLink::deserialize(QSettings* psettings)
@@ -108,6 +111,15 @@ void UDPLink::deserialize(QSettings* psettings)
     setPort(psettings->value("UDPLINK_PORT").toInt());
 }
 
+int UDPLink::getId() const
+{
+    return link_id;
+}
+
+QString UDPLink::getGroupName()
+{
+    return QString("LINK_%1").arg(getId());
+}
 
 /**
  * @brief Runs the thread
@@ -412,10 +424,6 @@ bool UDPLink::isConnected() const
     return connectState;
 }
 
-int UDPLink::getId() const
-{
-    return id;
-}
 
 QString UDPLink::getName() const
 {
@@ -428,7 +436,6 @@ void UDPLink::setName(QString name)
     setGroupName(name);
     emit nameChanged(this->name);
 }
-
 
 qint64 UDPLink::getConnectionSpeed() const
 {

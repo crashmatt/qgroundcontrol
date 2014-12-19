@@ -42,13 +42,13 @@ TCPLink::TCPLink(QHostAddress hostAddress, quint16 socketPort) :
     _port(socketPort),
     _socket(NULL),
     _socketIsConnected(false),
-    LinkInterface("Links", "default")
+    LinkInterface(dynamic_cast<QGCSettingsGroup*>(LinkManager::instance()), "default")
 {
     // We're doing it wrong - because the Qt folks got the API wrong:
     // http://blog.qt.digia.com/blog/2010/06/17/youre-doing-it-wrong/
     moveToThread(this);
 
-    _linkId = getNextLinkId();
+    _linkId = LinkManager::instance()->getNextLinkID();
     _resetName();
     
     qDebug() << "TCP Created " << _name;

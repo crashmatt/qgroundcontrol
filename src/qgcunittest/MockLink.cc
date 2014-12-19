@@ -28,6 +28,7 @@
 #include <QFile>
 
 #include <string.h>
+#include "LinkManager.h"
 
 /// @file
 ///     @brief Mock implementation of a Link.
@@ -35,7 +36,7 @@
 ///     @author Don Gagne <don@thegagnes.com>
 
 MockLink::MockLink(void) :
-    _linkId(getNextLinkId()),
+    _linkId(LinkManager::instance()->getNextLinkID()),
     _name("MockLink"),
     _connected(false),
     _vehicleSystemId(128),     // FIXME: Pull from eventual parameter manager
@@ -44,7 +45,7 @@ MockLink::MockLink(void) :
     _mavlinkStarted(false),
     _mavMode(MAV_MODE_FLAG_MANUAL_INPUT_ENABLED),
     _mavState(MAV_STATE_STANDBY),
-    LinkInterface("Links", "MockLink")
+    LinkInterface(dynamic_cast<QGCSettingsGroup*>(LinkManager::instance()), "MockLink")
 {
     _missionItemHandler = new MockLinkMissionItemHandler(_vehicleSystemId, this);
     Q_CHECK_PTR(_missionItemHandler);

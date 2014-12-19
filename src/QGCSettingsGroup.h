@@ -4,26 +4,31 @@
 #include <QObject>
 #include <QList>
 #include <QSettings>
-#include "QGCSetting.h"
+
 
 class QGCSettingsGroup
 {
-    QString _parentPath;
-    QString _groupName;
+public:
+    explicit QGCSettingsGroup(QGCSettingsGroup* pparentGroup, QString groupName = "default");
 
-    QString getGroupPath();
+    void setGroupName(QString groupName);
+    void loadGroup();
+    void saveGroup();
 
 protected:
     virtual void serialize(QSettings* psettings);
     virtual void deserialize(QSettings* psettings);
     virtual QString getGroupName(void);
+    virtual void saveChildren(void);
+    virtual void loadChildren(void);
 
-public:
-    explicit QGCSettingsGroup(QString parentPath, QString groupName = "default");
+    QString getGroupPath();
 
-    void setGroupName(QString groupName);
-    void loadGroup();
-    void saveGroup();
+private:
+    QGCSettingsGroup* p_parent;
+    QString         _groupName;
+
+
 signals:
 
 public slots:

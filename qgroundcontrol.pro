@@ -138,6 +138,7 @@ MacBuild {
 LinuxBuild {
 	DEFINES += __STDC_LIMIT_MACROS
     CONFIG += qesp_linux_udev
+	MAKEOPTS = -j3
 }
 
 WindowsBuild {
@@ -480,7 +481,8 @@ HEADERS += \
     src/ui/HUDPanel.h \
     src/ui/HUDPanelWidget.h \
     QGCSettings.h \
-    src/QGCSettingsGroup.h
+    src/QGCSettingsGroup.h \
+    src/comm/QGCFactory.h
 
 SOURCES += \
     src/main.cc \

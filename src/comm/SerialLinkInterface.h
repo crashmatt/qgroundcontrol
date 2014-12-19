@@ -42,8 +42,8 @@ class SerialLinkInterface : public LinkInterface
     Q_OBJECT
 
 public:
-    SerialLinkInterface(QString settingsPath, QString name) :
-        LinkInterface(settingsPath, name)
+    SerialLinkInterface(QGCSettingsGroup* pparentGroup, QString name) :
+        LinkInterface(pparentGroup, name)
     {
     }
 

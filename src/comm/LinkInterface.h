@@ -41,6 +41,8 @@ along with PIXHAWK. If not, see <http://www.gnu.org/licenses/>.
 
 class LinkManager;
 
+#define LINK_INVALID_ID 0
+
 /**
 * The link interface defines the interface for all links used to communicate
 * with the groundstation application.
@@ -56,15 +58,16 @@ class LinkInterface : public QThread, public QGCSettingsGroup
 protected:
     
 public:
-    LinkInterface(QString settingsPath, QString name) :
+    LinkInterface(QGCSettingsGroup *pparentGroup, QString groupName) :
         QThread(0),
         _ownedByLinkManager(false),
         _deletedByLinkManager(false),
-        QGCSettingsGroup(settingsPath, name)
+        QGCSettingsGroup(pparentGroup, groupName)
     {
         // Initialize everything for the data rate calculation buffers.
         inDataIndex = 0;
         outDataIndex = 0;
+//        link_id = LINK_INVALID_ID;    // link identifier set at invalid
 
         // Initialize our data rate buffers manually, cause C++<03 is dumb.
         for (int i = 0; i < dataRateBufferSize; ++i)
@@ -152,6 +155,7 @@ public:
     bool connect(void);
     bool disconnect(void);
 
+
 public slots:
 
     /**
@@ -206,6 +210,12 @@ signals:
     void communicationUpdate(const QString& linkname, const QString& text);
 
 protected:
+    int link_id;  ///< Tracking next available unique ID for each link
+
+    // overide the group name for link ID named groups
+    QString getGroupName(void){
+        return tr("LINK_%1").arg(getId());
+    }
 
     static const int dataRateBufferSize = 20; ///< Specify how many data points to capture for data rate calculations.
 
@@ -310,10 +320,6 @@ protected:
         return dataRate;
     }
 
-    static int getNextLinkId() {
-        static int nextId = 1;
-        return nextId++;
-    }
 
 protected slots:
 

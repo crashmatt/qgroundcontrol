@@ -58,7 +58,7 @@ This file is part of the QGROUNDCONTROL project
 MAVLinkSimulationLink::MAVLinkSimulationLink(QString readFile, QString writeFile, int rate) :
     readyBytes(0),
     timeOffset(0),
-    LinkInterface("Links", "SimulationLink")
+    LinkInterface(dynamic_cast<QGCSettingsGroup*>(LinkManager::instance()), "SimulationLink")
 {
     this->rate = rate;
     _isConnected = false;
@@ -106,7 +106,7 @@ MAVLinkSimulationLink::MAVLinkSimulationLink(QString readFile, QString writeFile
     // Initialize the pseudo-random number generator
     srand(QTime::currentTime().msec());
     maxTimeNoise = 0;
-    this->id = getNextLinkId();
+    this->id = LinkManager::instance()->getNextLinkID();
     LinkManager::instance()->add(this);
 }
 
