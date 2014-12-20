@@ -158,53 +158,55 @@ bool LinkManager::loadAllLinks(){
     QString linkType;
     QString linkName;
     QString path;
-    QStringList links = settings.childGroups();
+
+    QStringList links;
+/*
+    settings.beginGroup(getGroupPath());
+    links = settings.childGroups();
+    settings.endGroup();
+*/
+
+
+    settings.beginGroup(getGroupPath());
+    QStringList keys = settings.allKeys();
+    settings.endGroup();
+
+    QString key;
+    QStringList splitted;
+   // search for TYPE keyword as second key.  Extract link name from that.
+    foreach(key, keys){
+        splitted = key.split("/");
+        if(splitted.value(1) == "TYPE"){
+            linkName = splitted.value(0);
+            links.append(linkName);
+        }
+    }
+
 
     loadGroup();
 
-    settings.beginGroup(getGroupPath());
     foreach(linkName, links){
         path = getGroupName() + "/" + linkName + "/TYPE";
         linkType = settings.value(path).toString();
+        LinkInterface* pnewIF = NULL;
 
         if(linkType == "UDPLink"){
-            add(new UDPLink(this, linkName));
+            add(pnewIF = new UDPLink(this, linkName));
             foundLink = true;
-            break;
         };
+
         if(linkType == "SerialLink"){
-            add(new SerialLink(this, linkName));
+            add(pnewIF = new SerialLink(this, linkName));
             foundLink = true;
-            break;
         };
+
+        // If a new interface is created then connect it to a protocol
+//        if(pnewIF != NULL){
+//            addProtocol(pnewIF, mavlink);
+//        }
     }
 
-    settings.endGroup();
-
     return foundLink;
-
-/*    bool foundLink = false;
-    QString linkType;
-    QString linkName;
-    QString path;
-    QSettings settings;
-    settings.beginGroup("Links");
-    QStringList links = settings.childGroups();
-
-    QListIterator<QString> it(links);
-    while(it.hasNext()){
-        linkName = it.next();
-        path = linkName + "/LINK_TYPE";
-        linkType = settings.value(path).toString();
-
-        if(linkType == "UDP"){
-            add(new UDPLink(this, linkName));
-            foundLink = true;
-            break;
-        };
-    };
-    return foundLink;
-*/
 }
 
 bool LinkManager::connectAll()

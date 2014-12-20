@@ -43,7 +43,7 @@ This file is part of the QGROUNDCONTROL project
 
 UDPLink::UDPLink(QGCSettingsGroup* pparentGroup, QString groupName) :
     socket(NULL),
-    LinkInterface(pparentGroup, name)
+    LinkInterface(pparentGroup, groupName)
 {
     // We're doing it wrong - because the Qt folks got the API wrong:
     // http://blog.qt.digia.com/blog/2010/06/17/youre-doing-it-wrong/

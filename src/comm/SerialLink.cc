@@ -26,7 +26,7 @@ SerialLink::SerialLink(QGCSettingsGroup* pparentGroup, QString groupName) :
     // http://blog.qt.digia.com/blog/2010/06/17/youre-doing-it-wrong/
     moveToThread(this);
 
-    // Set unique ID and add link to the list of links
+    // Set unique ID
     int temp_id = groupName.split("_").value(1).toInt();
     if(LinkManager::instance()->isIDinLinks(temp_id))
         this->link_id = LinkManager::instance()->getNextLinkID();
@@ -34,6 +34,9 @@ SerialLink::SerialLink(QGCSettingsGroup* pparentGroup, QString groupName) :
         this->link_id = temp_id;
 
     loadGroup();
+
+    if(m_portName == "")
+        m_portName = groupName;
 
     emit nameChanged(this->m_portName);
     qDebug() << "Serial Created " << m_portName;
