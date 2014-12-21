@@ -23,6 +23,7 @@ void QGCSettingsGroup::loadGroup(){
 void QGCSettingsGroup::saveGroup(){
     QSettings settings;
     QString groupPath = getGroupPath();
+    settings.remove(groupPath);
     settings.beginGroup(groupPath);
     serialize(&settings);
     settings.endGroup();
