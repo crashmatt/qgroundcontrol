@@ -36,6 +36,7 @@
 ///     @author Don Gagne <don@thegagnes.com>
 
 MockLink::MockLink(void) :
+    LinkInterface(dynamic_cast<QGCSettingsGroup*>(LinkManager::instance()), "MockLink"),
     _linkId(LinkManager::instance()->getNextLinkID()),
     _name("MockLink"),
     _connected(false),
@@ -44,8 +45,7 @@ MockLink::MockLink(void) :
     _inNSH(false),
     _mavlinkStarted(false),
     _mavMode(MAV_MODE_FLAG_MANUAL_INPUT_ENABLED),
-    _mavState(MAV_STATE_STANDBY),
-    LinkInterface(dynamic_cast<QGCSettingsGroup*>(LinkManager::instance()), "MockLink")
+    _mavState(MAV_STATE_STANDBY)
 {
     _missionItemHandler = new MockLinkMissionItemHandler(_vehicleSystemId, this);
     Q_CHECK_PTR(_missionItemHandler);

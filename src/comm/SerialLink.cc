@@ -938,7 +938,3 @@ bool SerialLink::setStopBitsType(int stopBits)
 }
 
 
-QString SerialLink::getGroupName()
-{
-    return QString("LINK_%1").arg(getId());
-}

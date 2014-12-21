@@ -160,13 +160,13 @@ bool LinkManager::loadAllLinks(){
     QString path;
 
     QStringList links;
-/*
+
     settings.beginGroup(getGroupPath());
     links = settings.childGroups();
     settings.endGroup();
-*/
 
 
+/*
     settings.beginGroup(getGroupPath());
     QStringList keys = settings.allKeys();
     settings.endGroup();
@@ -181,7 +181,7 @@ bool LinkManager::loadAllLinks(){
             links.append(linkName);
         }
     }
-
+*/
 
     loadGroup();
 

@@ -60,9 +60,9 @@ protected:
 public:
     LinkInterface(QGCSettingsGroup *pparentGroup, QString groupName) :
         QThread(0),
+        QGCSettingsGroup(pparentGroup, groupName),
         _ownedByLinkManager(false),
-        _deletedByLinkManager(false),
-        QGCSettingsGroup(pparentGroup, groupName)
+        _deletedByLinkManager(false)
     {
         // Initialize everything for the data rate calculation buffers.
         inDataIndex = 0;
@@ -212,7 +212,13 @@ signals:
 protected:
     int link_id;  ///< Tracking next available unique ID for each link
 
-    // overide the group name for link ID named groups
+    /**
+     * @brief Get the settings group name of this link
+     *
+     * Overide of the QGCSettings class getId()
+     * The group name is a string formatted LINK_nn where nn is the unique link ID
+     * @return Group name of this link
+     **/
     QString getGroupName(void){
         return tr("LINK_%1").arg(getId());
     }

@@ -42,8 +42,8 @@ This file is part of the QGROUNDCONTROL project
 
 
 UDPLink::UDPLink(QGCSettingsGroup* pparentGroup, QString groupName) :
-    socket(NULL),
-    LinkInterface(pparentGroup, groupName)
+    LinkInterface(pparentGroup, groupName),
+    socket(NULL)
 {
     // We're doing it wrong - because the Qt folks got the API wrong:
     // http://blog.qt.digia.com/blog/2010/06/17/youre-doing-it-wrong/
@@ -61,7 +61,7 @@ UDPLink::UDPLink(QGCSettingsGroup* pparentGroup, QString groupName) :
     loadGroup();
 
 //    this->name = tr("UDP Link (port:%1)").arg(this->port);
-    this->name = name;
+//    this->name = name;
     emit nameChanged(this->name);
     // LinkManager::instance()->add(this);
     qDebug() << "UDP Created " << name;
@@ -114,11 +114,6 @@ void UDPLink::deserialize(QSettings* psettings)
 int UDPLink::getId() const
 {
     return link_id;
-}
-
-QString UDPLink::getGroupName()
-{
-    return QString("LINK_%1").arg(getId());
 }
 
 /**
