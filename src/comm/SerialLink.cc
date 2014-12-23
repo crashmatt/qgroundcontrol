@@ -17,10 +17,34 @@
 #include "SerialLink.h"
 #include "QGC.h"
 #include <MG.h>
+#include "LinkManager.h"
+
+SerialLink::SerialLink(QGCSettingsGroup* pparentGroup, QString groupName) :
+    SerialLinkInterface(pparentGroup, groupName)
+{
+    // We're doing it wrong - because the Qt folks got the API wrong:
+    // http://blog.qt.digia.com/blog/2010/06/17/youre-doing-it-wrong/
+    moveToThread(this);
+
+    // Set unique ID
+    int temp_id = groupName.split("_").value(1).toInt();
+    if(LinkManager::instance()->isIDinLinks(temp_id))
+        this->link_id = LinkManager::instance()->getNextLinkID();
+    else
+        this->link_id = temp_id;
+
+    loadGroup();
+
+    if(m_portName == "")
+        m_portName = groupName;
+
+    emit nameChanged(this->m_portName);
+    qDebug() << "Serial Created " << m_portName;
+}
 
 SerialLink::SerialLink(QString portname, int baudRate, bool hardwareFlowControl, bool parity,
                        int dataBits, int stopBits) :
-    SerialLinkInterface("Links", portname),
+    SerialLinkInterface(dynamic_cast<QGCSettingsGroup*>(LinkManager::instance()), "default"),
     m_bytesRead(0),
     m_port(Q_NULLPTR),
     type(""),
@@ -40,12 +64,10 @@ SerialLink::SerialLink(QString portname, int baudRate, bool hardwareFlowControl,
         m_portName = ports.first().trimmed();
     }
 
-    setGroupName(m_portName);
-
     checkIfCDC();
 
     // Set unique ID and add link to the list of links
-    m_id = getNextLinkId();
+    link_id = LinkManager::instance()->getNextLinkID();
 
     m_baud = baudRate;
 
@@ -69,7 +91,7 @@ SerialLink::SerialLink(QString portname, int baudRate, bool hardwareFlowControl,
     m_dataBits = dataBits;
     m_stopBits = stopBits;
 
-//    loadSettings();
+    loadSettings();
 
     qDebug() << "create SerialLink " << portname << baudRate << hardwareFlowControl
              << parity << dataBits << stopBits;
@@ -137,39 +159,35 @@ bool SerialLink::isBootloader()
 
 void SerialLink::serialize(QSettings* psettings)
 {
-    psettings->setValue("LINK_TYPE", "SERIAL");
+    psettings->setValue("TYPE", "SerialLink");
+    psettings->setValue("NAME", this->getName());
     psettings->setValue("SERIALLINK_COMM_PORT", getPortName());
     psettings->setValue("SERIALLINK_COMM_BAUD", getBaudRateType());
     psettings->setValue("SERIALLINK_COMM_PARITY", getParityType());
     psettings->setValue("SERIALLINK_COMM_STOPBITS", getStopBits());
     psettings->setValue("SERIALLINK_COMM_DATABITS", getDataBits());
     psettings->setValue("SERIALLINK_COMM_FLOW_CONTROL", getFlowType());
-    psettings->sync();
-
 }
 
 void SerialLink::deserialize(QSettings* psettings)
 {
+    m_portName = psettings->value("SERIALLINK_COMM_PORT").toString();
+    checkIfCDC();
 
+    this->m_portName = psettings->value("NAME").toString();
+    emit nameChanged(this->m_portName);
+
+    m_baud = psettings->value("SERIALLINK_COMM_BAUD").toInt();
+    m_parity = psettings->value("SERIALLINK_COMM_PARITY").toInt();
+    m_stopBits = psettings->value("SERIALLINK_COMM_STOPBITS").toInt();
+    m_dataBits = psettings->value("SERIALLINK_COMM_DATABITS").toInt();
+    m_flowControl = psettings->value("SERIALLINK_COMM_FLOW_CONTROL").toInt();
 }
 
 
 void SerialLink::loadSettings()
 {
-    // Load defaults from settings
-    QSettings settings;
-    settings.sync();
-    if (settings.contains("SERIALLINK_COMM_PORT"))
-    {
-        m_portName = settings.value("SERIALLINK_COMM_PORT").toString();
-        checkIfCDC();
-
-        m_baud = settings.value("SERIALLINK_COMM_BAUD").toInt();
-        m_parity = settings.value("SERIALLINK_COMM_PARITY").toInt();
-        m_stopBits = settings.value("SERIALLINK_COMM_STOPBITS").toInt();
-        m_dataBits = settings.value("SERIALLINK_COMM_DATABITS").toInt();
-        m_flowControl = settings.value("SERIALLINK_COMM_FLOW_CONTROL").toInt();
-    }
+    loadGroup();
 }
 
 void SerialLink::writeSettings()
@@ -532,8 +550,7 @@ bool SerialLink::hardwareConnect(QString &type)
     qDebug() << "CONNECTING LINK: " << __FILE__ << __LINE__ << "type:" << type << "with settings" << m_port->portName()
              << getBaudRate() << getDataBits() << getParityType() << getStopBits();
 
-//    writeSettings();
-    saveGroup();
+    writeSettings();
 
     return true; // successful connection
 }
@@ -570,14 +587,14 @@ bool SerialLink::isConnected() const
     }
 }
 
-int SerialLink::getId() const
-{
-    return m_id;
-}
-
 QString SerialLink::getName() const
 {
     return m_portName;
+}
+
+int SerialLink::getId() const
+{
+    return link_id;
 }
 
 /**

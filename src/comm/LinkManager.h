@@ -41,6 +41,7 @@ This file is part of the PIXHAWK project
 #include "SerialLink.h"
 #include "ProtocolInterface.h"
 #include "QGCSingleton.h"
+#include "QGCSettingsGroup.h"
 
 class LinkManagerTest;
 
@@ -50,7 +51,7 @@ class LinkManagerTest;
  * protocol instance to transport the link data into the application.
  *
  **/
-class LinkManager : public QGCSingleton
+class LinkManager : public QGCSingleton, public QGCSettingsGroup
 {
     Q_OBJECT
 
@@ -101,6 +102,11 @@ public slots:
     bool disconnectLink(LinkInterface* link);
 
     bool loadAllLinks();
+
+    int getNextLinkID(void);
+    bool isIDinLinks(int id);
+
+    void saveChildren(void);
 
 signals:
     void newLink(LinkInterface* link);

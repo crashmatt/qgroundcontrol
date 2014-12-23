@@ -66,6 +66,7 @@ void LinkManager::deleteInstance(void)
  **/
 LinkManager::LinkManager(QObject* parent, bool registerSingleton) :
     QGCSingleton(parent, registerSingleton),
+    QGCSettingsGroup(NULL, "Links"),
     _connectionsSuspended(false)
 {
     _links = QList<LinkInterface*>();
@@ -74,6 +75,9 @@ LinkManager::LinkManager(QObject* parent, bool registerSingleton) :
 
 LinkManager::~LinkManager()
 {
+    // Save all the settings before exit
+    saveGroup();
+
     disconnectAll();
     
     foreach (LinkInterface* link, _links) {
@@ -146,27 +150,43 @@ ProtocolInterface* LinkManager::getProtocolForLink(LinkInterface* link)
 	return protocol;
 }
 
+
 bool LinkManager::loadAllLinks(){
     bool foundLink = false;
+    QSettings settings;
     QString linkType;
     QString linkName;
     QString path;
-    QSettings settings;
-    settings.beginGroup("Links");
-    QStringList links = settings.childGroups();
 
-    QListIterator<QString> it(links);
-    while(it.hasNext()){
-        linkName = it.next();
-        path = linkName + "/LINK_TYPE";
+    QStringList links;
+
+    settings.beginGroup(getGroupPath());
+    links = settings.childGroups();
+    settings.endGroup();
+
+    loadGroup();
+
+    foreach(linkName, links){
+        path = getGroupName() + "/" + linkName + "/TYPE";
         linkType = settings.value(path).toString();
+        LinkInterface* pnewIF = NULL;
 
-        if(linkType == "UDP"){
-            add(new UDPLink("Links", linkName));
+        if(linkType == "UDPLink"){
+            add(pnewIF = new UDPLink(this, linkName));
             foundLink = true;
-            break;
         };
-    };
+
+        if(linkType == "SerialLink"){
+            add(pnewIF = new SerialLink(this, linkName));
+            foundLink = true;
+        };
+
+        // If a new interface is created then connect it to a protocol
+//        if(pnewIF != NULL){
+//            addProtocol(pnewIF, mavlink);
+//        }
+    }
+
     return foundLink;
 }
 
@@ -298,4 +318,29 @@ void LinkManager::setConnectionsSuspended(QString reason)
     _connectionsSuspended = true;
     _connectionsSuspendedReason = reason;
     Q_ASSERT(!reason.isEmpty());
+}
+
+int LinkManager::getNextLinkID(void){
+    int nextLink = 1;
+    bool nextLinkFound = false;
+
+    while(isIDinLinks(nextLink) == true){
+        nextLink++;
+    }
+    return nextLink;
+}
+
+bool LinkManager::isIDinLinks(int id){
+    foreach(LinkInterface* link, _links){
+        if(link->getId() == id)
+            return true;
+    }
+    return false;
+}
+
+
+void LinkManager::saveChildren(void){
+    foreach(LinkInterface* link, _links){
+        link->saveGroup();
+    }
 }

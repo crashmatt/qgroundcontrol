@@ -41,6 +41,8 @@ along with PIXHAWK. If not, see <http://www.gnu.org/licenses/>.
 
 class LinkManager;
 
+#define LINK_INVALID_ID 0
+
 /**
 * The link interface defines the interface for all links used to communicate
 * with the groundstation application.
@@ -52,19 +54,18 @@ class LinkInterface : public QThread, public QGCSettingsGroup
     
     // Only LinkManager is allowed to _connect, _disconnect or delete a link
     friend class LinkManager;
-
-protected:
     
 public:
-    LinkInterface(QString settingsPath, QString name) :
+    LinkInterface(QGCSettingsGroup *pparentGroup, QString groupName) :
         QThread(0),
+        QGCSettingsGroup(pparentGroup, groupName),
         _ownedByLinkManager(false),
-        _deletedByLinkManager(false),
-        QGCSettingsGroup(settingsPath, name)
+        _deletedByLinkManager(false)
     {
         // Initialize everything for the data rate calculation buffers.
         inDataIndex = 0;
         outDataIndex = 0;
+//        link_id = LINK_INVALID_ID;    // link identifier set at invalid
 
         // Initialize our data rate buffers manually, cause C++<03 is dumb.
         for (int i = 0; i < dataRateBufferSize; ++i)
@@ -206,6 +207,18 @@ signals:
     void communicationUpdate(const QString& linkname, const QString& text);
 
 protected:
+    int link_id;  ///< Tracking next available unique ID for each link
+
+    /**
+     * @brief Get the settings group name of this link
+     *
+     * Overide of the QGCSettings class getId()
+     * The group name is a string formatted LINK_nn where nn is the unique link ID
+     * @return Group name of this link
+     **/
+    QString getGroupName(void){
+        return tr("LINK_%1").arg(getId());
+    }
 
     static const int dataRateBufferSize = 20; ///< Specify how many data points to capture for data rate calculations.
 
