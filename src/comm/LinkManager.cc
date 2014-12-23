@@ -135,6 +135,8 @@ void LinkManager::addProtocol(LinkInterface* link, ProtocolInterface* protocol)
     //qDebug() << __FILE__ << __LINE__ << "ADDED LINK TO PROTOCOL" << link->getName() << protocol->getName() << "NEW SIZE OF LINK LIST:" << _protocolLinks.size();
 }
 
+
+
 QList<LinkInterface*> LinkManager::getLinksForProtocol(ProtocolInterface* protocol)
 {
     _dataMutex.lock();
@@ -164,24 +166,6 @@ bool LinkManager::loadAllLinks(){
     settings.beginGroup(getGroupPath());
     links = settings.childGroups();
     settings.endGroup();
-
-
-/*
-    settings.beginGroup(getGroupPath());
-    QStringList keys = settings.allKeys();
-    settings.endGroup();
-
-    QString key;
-    QStringList splitted;
-   // search for TYPE keyword as second key.  Extract link name from that.
-    foreach(key, keys){
-        splitted = key.split("/");
-        if(splitted.value(1) == "TYPE"){
-            linkName = splitted.value(0);
-            links.append(linkName);
-        }
-    }
-*/
 
     loadGroup();
 
