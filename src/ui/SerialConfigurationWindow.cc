@@ -43,7 +43,7 @@ SerialConfigurationWindow::SerialConfigurationWindow(LinkInterface* link, QWidge
 
     if(serialLink != 0)
     {
-        serialLink->loadSettings();
+//        serialLink->loadSettings();       // NO!
         this->link = serialLink;
 
         // Setup the user interface according to link type

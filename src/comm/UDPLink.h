@@ -37,6 +37,7 @@ This file is part of the QGROUNDCONTROL project
 #include <QMutex>
 #include <QUdpSocket>
 #include <LinkInterface.h>
+#include <QMetaType>
 #include "QGCConfig.h"
 
 class UDPLink : public LinkInterface
@@ -45,6 +46,7 @@ class UDPLink : public LinkInterface
     //Q_INTERFACES(UDPLinkInterface:LinkInterface)
 
 public:
+    UDPLink(QGCSettingsGroup* pparentGroup, QString groupName);
     UDPLink(QHostAddress host = QHostAddress::Any, quint16 port = 14550);
     //UDPLink(QHostAddress host = "239.255.76.67", quint16 port = 7667);
     ~UDPLink();
@@ -76,13 +78,14 @@ public:
     qint64 getCurrentOutDataRate() const;
 
     void run();
-
-    int getId() const;
     
     // These are left unimplemented in order to cause linker errors which indicate incorrect usage of
     // connect/disconnect on link directly. All connect/disconnect calls should be made through LinkManager.
     bool connect(void);
     bool disconnect(void);
+
+    void serialize(QSettings* psettings);
+    void deserialize(QSettings* psettings);
 
 public slots:
     void setAddress(QHostAddress host);
@@ -106,7 +109,6 @@ protected:
     QString name;
     QHostAddress host;
     quint16 port;
-    int id;
     QUdpSocket* socket;
     bool connectState;
     QList<QHostAddress> hosts;
@@ -120,12 +122,13 @@ private:
     // From LinkInterface
     virtual bool _connect(void);
     virtual bool _disconnect(void);
-
 	bool hardwareConnect(void);
 
 signals:
     //Signals are defined by LinkInterface
 
 };
+
+
 
 #endif // UDPLINK_H

@@ -38,6 +38,7 @@
 ///     @author Don Gagne <don@thegagnes.com>
 
 TCPLink::TCPLink(QHostAddress hostAddress, quint16 socketPort) :
+    LinkInterface(dynamic_cast<QGCSettingsGroup*>(LinkManager::instance()), "default"),
     _hostAddress(hostAddress),
     _port(socketPort),
     _socket(NULL),
@@ -47,7 +48,7 @@ TCPLink::TCPLink(QHostAddress hostAddress, quint16 socketPort) :
     // http://blog.qt.digia.com/blog/2010/06/17/youre-doing-it-wrong/
     moveToThread(this);
 
-    _linkId = getNextLinkId();
+    _linkId = LinkManager::instance()->getNextLinkID();
     _resetName();
     
     qDebug() << "TCP Created " << _name;
@@ -261,11 +262,6 @@ bool TCPLink::isConnected() const
     return _socketIsConnected;
 }
 
-int TCPLink::getId() const
-{
-    return _linkId;
-}
-
 QString TCPLink::getName() const
 {
     return _name;
@@ -289,6 +285,7 @@ qint64 TCPLink::getCurrentOutDataRate() const
 void TCPLink::_resetName(void)
 {
     _name = QString("TCP Link (host:%1 port:%2)").arg(_hostAddress.toString()).arg(_port);
+    setGroupName(_name);
     emit nameChanged(_name);
 }
 

@@ -36,6 +36,7 @@ This file is part of the QGROUNDCONTROL project
 #include <QThread>
 #include <QMutex>
 #include <QString>
+#include <QSettings>
 #include "QGCConfig.h"
 #include "SerialLinkInterface.h"
 
@@ -43,6 +44,8 @@ This file is part of the QGROUNDCONTROL project
 #include <QSerialPort>
 #include <QMetaType>
 Q_DECLARE_METATYPE(QSerialPort::SerialPortError)
+
+
 
 /**
  * @brief The SerialLink class provides cross-platform access to serial links.
@@ -59,6 +62,8 @@ class SerialLink : public SerialLinkInterface
 
 
 public:
+    SerialLink(QGCSettingsGroup* pparentGroup, QString groupName);
+
     SerialLink(QString portname = "",
                int baudrate=57600,
                bool flow=false,
@@ -105,13 +110,14 @@ public:
     void loadSettings();
     void writeSettings();
 
+    void serialize(QSettings* psettings);
+    void deserialize(QSettings* psettings);
+
     void checkIfCDC();
 
     void run();
     void run2();
 
-    int getId() const;
-    
     // These are left unimplemented in order to cause linker errors which indicate incorrect usage of
     // connect/disconnect on link directly. All connect/disconnect calls should be made through LinkManager.
     bool connect(void);
@@ -157,7 +163,6 @@ protected:
     int m_parity;
     QString m_portName;
     int m_timeout;
-    int m_id;
     QMutex m_dataMutex;       // Mutex for reading data from m_port
     QMutex m_writeMutex;      // Mutex for accessing the m_transmitBuffer.
     QString type;
@@ -182,5 +187,6 @@ signals:
     void aboutToCloseFlag();
 
 };
+
 
 #endif // SERIALLINK_H

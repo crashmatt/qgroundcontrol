@@ -152,6 +152,7 @@ MacBuild {
 LinuxBuild {
 	DEFINES += __STDC_LIMIT_MACROS
     CONFIG += qesp_linux_udev
+	MAKEOPTS = -j3
 }
 
 WindowsBuild {
@@ -491,7 +492,8 @@ HEADERS += \
     src/QGCComboBox.h \
     src/QGCTemporaryFile.h \
     src/audio/QGCAudioWorker.h \
-    src/QGCQuickWidget.h
+    src/QGCQuickWidget.h \
+    src/QGCSettingsGroup.h
 
 SOURCES += \
     src/main.cc \
@@ -631,6 +633,8 @@ SOURCES += \
     src/QGCTemporaryFile.cc \
     src/audio/QGCAudioWorker.cpp \
     src/QGCQuickWidget.cc \
+    src/QGCSettingsGroup.cc \
+    src/comm/LinkInterface.cpp
 
 #
 # Unit Test specific configuration goes here

@@ -37,42 +37,28 @@ along with PIXHAWK. If not, see <http://www.gnu.org/licenses/>.
 #include <QMutex>
 #include <QMutexLocker>
 #include <QMetaType>
+#include "QGCSettingsGroup.h"
 
 class LinkManager;
+
+#define LINK_INVALID_ID -1
 
 /**
 * The link interface defines the interface for all links used to communicate
 * with the groundstation application.
 *
 **/
-class LinkInterface : public QThread
+class LinkInterface : public QThread, public QGCSettingsGroup
 {
     Q_OBJECT
     
     // Only LinkManager is allowed to _connect, _disconnect or delete a link
     friend class LinkManager;
+
+protected:
     
 public:
-    LinkInterface() :
-        QThread(0),
-        _ownedByLinkManager(false),
-        _deletedByLinkManager(false)
-    {
-        // Initialize everything for the data rate calculation buffers.
-        inDataIndex = 0;
-        outDataIndex = 0;
-
-        // Initialize our data rate buffers manually, cause C++<03 is dumb.
-        for (int i = 0; i < dataRateBufferSize; ++i)
-        {
-            inDataWriteAmounts[i] = 0;
-            inDataWriteTimes[i] = 0;
-            outDataWriteAmounts[i] = 0;
-            outDataWriteTimes[i] = 0;
-        }
-
-        qRegisterMetaType<LinkInterface*>("LinkInterface*");
-    }
+    LinkInterface(QGCSettingsGroup *pparentGroup, QString groupName);
 
     virtual ~LinkInterface() {
         // LinkManager take ownership of Links once they are added to it. Once added to LinkManager
@@ -88,7 +74,7 @@ public:
      * The ID is an unsigned integer, starting at 0
      * @return ID of this link
      **/
-    virtual int getId() const = 0;
+    int getId() const;
 
     /**
      * @brief Get the human readable name of this link
@@ -148,6 +134,7 @@ public:
     bool connect(void);
     bool disconnect(void);
 
+
 public slots:
 
     /**
@@ -197,6 +184,16 @@ signals:
     void communicationUpdate(const QString& linkname, const QString& text);
 
 protected:
+    int link_id;  ///< Tracking next available unique ID for each link
+
+    /**
+     * @brief Get the settings group name of this link
+     *
+     * Overide of the QGCSettings class getGroupName()
+     * The group name is a string formatted LINK_nn where nn is the unique link ID
+     * @return Group name of this link
+     **/
+    QString getGroupName(void);
 
     static const int dataRateBufferSize = 20; ///< Specify how many data points to capture for data rate calculations.
 
@@ -301,10 +298,6 @@ protected:
         return dataRate;
     }
 
-    static int getNextLinkId() {
-        static int nextId = 1;
-        return nextId++;
-    }
 
 protected slots:
 
@@ -333,6 +326,7 @@ private:
     
     bool _ownedByLinkManager;   ///< true: This link has been added to LinkManager, false: Link not added to LinkManager
     bool _deletedByLinkManager; ///< true: Link being deleted from LinkManager, false: error, Links should only be deleted from LinkManager
+
 };
 
 #endif // _LINKINTERFACE_H_
