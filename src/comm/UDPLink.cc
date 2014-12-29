@@ -60,7 +60,7 @@ UDPLink::UDPLink(QGCSettingsGroup* pparentGroup, QString groupName) :
 
     loadGroup();
 
-//    this->name = tr("UDP Link (port:%1)").arg(this->port);
+    this->name = tr("UDP Link (port:%1)").arg(this->port);
 //    this->name = name;
     emit nameChanged(this->name);
     // LinkManager::instance()->add(this);
@@ -147,9 +147,7 @@ void UDPLink::setPort(int port)
 	}
     this->port = port;
 	this->name = tr("UDP Link (port:%1)").arg(this->port);
-    setGroupName(this->name);
 	emit nameChanged(this->name);
-    saveGroup();
 	if(reconnect)
 	{
 		_connect();
@@ -419,7 +417,6 @@ QString UDPLink::getName() const
 void UDPLink::setName(QString name)
 {
     this->name = name;
-    setGroupName(name);
     emit nameChanged(this->name);
 }
 

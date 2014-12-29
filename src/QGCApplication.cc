@@ -174,6 +174,7 @@ QGCApplication::QGCApplication(int &argc, char* argv[], bool unitTesting) :
 
 QGCApplication::~QGCApplication()
 {
+    LinkManager::instance()->saveGroup();
     _destroySingletons();
 }
 
