@@ -88,6 +88,11 @@ Rectangle {
         panelLoader.setSource("PX4FlowSensor.qml")
     }
 
+    function showMixersPanel()
+    {
+        panelLoader.setSource("SetupMixersTuning.qml")
+    }
+
     function showVehicleComponentPanel(vehicleComponent)
     {
         if (QGroundControl.multiVehicleManager.activeVehicle.armed && !vehicleComponent.allowSetupWhileArmed) {
@@ -336,6 +341,14 @@ Rectangle {
                 onClicked: showParametersPanel()
             }
 
+            SubMenuButton {
+                setupIndicator: false
+                exclusiveGroup: setupButtonGroup
+                visible:        QGroundControl.multiVehicleManager.parameterReadyVehicleAvailable
+                text:           "Mixers"
+
+                onClicked: showMixersPanel()
+            }
         }
     }
 

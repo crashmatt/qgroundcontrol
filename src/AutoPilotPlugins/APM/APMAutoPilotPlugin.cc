@@ -28,7 +28,6 @@
 #include "APMLightsComponent.h"
 #include "APMSubFrameComponent.h"
 #include "ESP8266Component.h"
-#include "MixersComponent.h"
 
 /// This is the AutoPilotPlugin implementatin for the MAV_AUTOPILOT_ARDUPILOT type.
 APMAutoPilotPlugin::APMAutoPilotPlugin(Vehicle* vehicle, QObject* parent)
@@ -103,10 +102,6 @@ const QVariantList& APMAutoPilotPlugin::vehicleComponents(void)
             _tuningComponent = new APMTuningComponent(_vehicle, this);
             _tuningComponent->setupTriggerSignals();
             _components.append(QVariant::fromValue((VehicleComponent*)_tuningComponent));
-
-            _mixersComponent = new MixersComponent(_vehicle, this);
-            _mixersComponent->setupTriggerSignals();
-            _components.append(QVariant::fromValue((VehicleComponent*)_mixersComponent));
 
             _cameraComponent = new APMCameraComponent(_vehicle, this);
             _cameraComponent->setupTriggerSignals();

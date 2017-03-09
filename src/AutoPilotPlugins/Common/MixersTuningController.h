@@ -13,8 +13,8 @@
 ///     @brief Mixers Config Qml Controller
 ///     @author
 
-#ifndef MixersComponentController_H
-#define MixersComponentController_H
+#ifndef MixersTuningController_H
+#define MixersTuningController_H
 
 #include <QTimer>
 
@@ -24,20 +24,20 @@
 #include "AutoPilotPlugin.h"
 #include <FactMetaData.h>
 
-Q_DECLARE_LOGGING_CATEGORY(MixersComponentControllerLog)
-Q_DECLARE_LOGGING_CATEGORY(MixersComponentControllerVerboseLog)
+Q_DECLARE_LOGGING_CATEGORY(MixersTuningControllerLog)
+Q_DECLARE_LOGGING_CATEGORY(MixersTuningControllerVerboseLog)
 
 namespace Ui {
-    class MixersComponentController;
+    class MixersTuningController;
 }
 
-class MixersComponentController : public FactPanelController
+class MixersTuningController : public FactPanelController
 {
     Q_OBJECT
 
 public:
-    MixersComponentController(void);
-    ~MixersComponentController();
+    MixersTuningController(void);
+    ~MixersTuningController();
 
     Q_PROPERTY(QQuickItem* getMixersCountButton MEMBER _getMixersCountButton    NOTIFY getMixersCountButtonChanged)
     Q_PROPERTY(QQuickItem* requestAllButton MEMBER _requestAllButton    NOTIFY requestAllButtonChanged)
@@ -107,4 +107,4 @@ private:
 //#endif
 };
 
-#endif // MixersComponentController_H
+#endif // MixersTuningController_H

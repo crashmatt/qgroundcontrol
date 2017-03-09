@@ -346,14 +346,16 @@ HEADERS += \
     src/MixersManager/mixer_io.h \
     src/MixersManager/mixer_type_id.h \
     src/MixersManager/mixer_types.h \
-    src/MixersManager/mixer_parameters.h
+    src/MixersManager/mixer_parameters.h \
+    src/AutoPilotPlugins/Common/MixersTuningController.h
 
 SOURCES += \
     src/api/QGCCorePlugin.cc \
     src/api/QGCOptions.cc \
     src/api/QGCSettings.cc \
     src/MixersManager/MixerFacts.cpp \
-    src/MixersManager/MixerMetaData.cpp
+    src/MixersManager/MixerMetaData.cpp \
+    src/AutoPilotPlugins/Common/MixersTuningController.cc
 
 #
 # Unit Test specific configuration goes here (requires full debug build with all plugins)
@@ -761,8 +763,6 @@ HEADERS+= \
     src/AutoPilotPlugins/AutoPilotPlugin.h \
     src/AutoPilotPlugins/Common/ESP8266Component.h \
     src/AutoPilotPlugins/Common/ESP8266ComponentController.h \
-    src/AutoPilotPlugins/Common/MixersComponent.h \
-    src/AutoPilotPlugins/Common/MixersComponentController.h \
     src/AutoPilotPlugins/Common/MotorComponent.h \
     src/AutoPilotPlugins/Common/RadioComponentController.h \
     src/AutoPilotPlugins/Generic/GenericAutoPilotPlugin.h \
@@ -784,8 +784,6 @@ SOURCES += \
     src/AutoPilotPlugins/AutoPilotPlugin.cc \
     src/AutoPilotPlugins/Common/ESP8266Component.cc \
     src/AutoPilotPlugins/Common/ESP8266ComponentController.cc \
-    src/AutoPilotPlugins/Common/MixersComponent.cc \
-    src/AutoPilotPlugins/Common/MixersComponentController.cc \
     src/AutoPilotPlugins/Common/MotorComponent.cc \
     src/AutoPilotPlugins/Common/RadioComponentController.cc \
     src/AutoPilotPlugins/Generic/GenericAutoPilotPlugin.cc \

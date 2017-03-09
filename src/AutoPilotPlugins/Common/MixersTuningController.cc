@@ -12,23 +12,23 @@
 ///     @brief Mixers Config Qml Controller
 ///     @author Matthew Coleman <uavflightdirector@gmail.com>
 
-#include "MixersComponentController.h"
+#include "MixersTuningController.h"
 #include "MixersManager.h"
 #include "QGCApplication.h"
 
 #include <QSettings>
 
-QGC_LOGGING_CATEGORY(MixersComponentControllerLog, "MixersComponentControllerLog")
-QGC_LOGGING_CATEGORY(MixersComponentControllerVerboseLog, "MixersComponentControllerVerboseLog")
+QGC_LOGGING_CATEGORY(MixersTuningControllerLog, "MixersTuningControllerLog")
+QGC_LOGGING_CATEGORY(MixersTuningControllerVerboseLog, "MixersTuningControllerVerboseLog")
 
 //#ifdef UNITTEST_BUILD
 //// Nasty hack to expose controller to unit test code
 //MixersComponentController* MixersComponentController::_unitTestController = NULL;
 //#endif
 
-const int MixersComponentController::_updateInterval = 150;              ///< Interval for timer which updates radio channel widgets
+const int MixersTuningController::_updateInterval = 150;              ///< Interval for timer which updates stuff
 
-MixersComponentController::MixersComponentController(void)
+MixersTuningController::MixersTuningController(void)
     : _mixers(new QmlObjectListModel(this))
     , _mockMetaData(FactMetaData::valueTypeString, this)
     , _mockFactList()
@@ -55,39 +55,44 @@ MixersComponentController::MixersComponentController(void)
     fact->setRawValue("2");
     _mockFactList.append(fact);
 
-    connect(_vehicle->mixersManager(), &MixersManager::mixerDataReadyChanged, this, &MixersComponentController::_updateMixers);
+    fact = new Fact(-1, "Mock Fact 3", FactMetaData::valueTypeString, this);
+    fact->setMetaData(&_mockMetaData);
+    fact->setRawValue("3");
+    _mockFactList.append(fact);
+
+    connect(_vehicle->mixersManager(), &MixersManager::mixerDataReadyChanged, this, &MixersTuningController::_updateMixers);
 }
 
 
 
-MixersComponentController::~MixersComponentController()
+MixersTuningController::~MixersTuningController()
 {
 //    _storeSettings();
 }
 
 
-void MixersComponentController::getMixersCountButtonClicked(void)
+void MixersTuningController::getMixersCountButtonClicked(void)
 {
     _vehicle->mixersManager()->requestMixerCount(0);
 }
 
 
-void MixersComponentController::requestAllButtonClicked(void)
+void MixersTuningController::requestAllButtonClicked(void)
 {
     _vehicle->mixersManager()->requestMixerAll(0);
 }
 
-void MixersComponentController::requestMissingButtonClicked(void)
+void MixersTuningController::requestMissingButtonClicked(void)
 {
     _vehicle->mixersManager()->requestMissingData(0);
 }
 
-void MixersComponentController::requestSubmixerCountButtonClicked(void)
+void MixersTuningController::requestSubmixerCountButtonClicked(void)
 {
     _vehicle->mixersManager()->requestSubmixerCount(0, 0);
 }
 
-void MixersComponentController::refreshGUIButtonClicked(void){
+void MixersTuningController::refreshGUIButtonClicked(void){
     QObjectList newMixerList;
     Fact* fact;
 
@@ -122,17 +127,17 @@ void MixersComponentController::refreshGUIButtonClicked(void){
 //}
 
 
-unsigned int MixersComponentController::groupValue(void)
+unsigned int MixersTuningController::groupValue(void)
 {    
     return 0;
 }
 
-float MixersComponentController::parameterValue(void)
+float MixersTuningController::parameterValue(void)
 {
     return 0.0;
 }
 
-void MixersComponentController::_updateMixers(void){
+void MixersTuningController::_updateMixers(void){
     QObjectList newMixerList;
 
     Fact* fact;
